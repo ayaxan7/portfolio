@@ -10,8 +10,6 @@ interface Particle {
   phi: number; // vertical angle (0 to π)
   size: number;
   color: string;
-  type: 'dot' | 'dash';
-  rotation: number;
   speed: number; // rotation speed multiplier
 }
 
@@ -68,8 +66,6 @@ export default function HeroBackground() {
         phi,
         size: Math.random() * 4 + 2,
         color: getColorForPhi(phi),
-        type: Math.random() > 0.5 ? 'dot' : 'dash',
-        rotation: Math.random() * 360,
         speed: 0.3 + Math.random() * 0.4,
       });
     }
@@ -190,26 +186,14 @@ function GlobeParticle({
       animate={{ opacity: depthOpacity }}
       transition={{ duration: 0.3 }}
     >
-      {particle.type === 'dot' ? (
-        <div
-          className="rounded-full"
-          style={{
-            width: particle.size,
-            height: particle.size,
-            backgroundColor: particle.color,
-          }}
-        />
-      ) : (
-        <div
-          className="rounded-full"
-          style={{
-            width: particle.size * 2.5,
-            height: particle.size,
-            backgroundColor: particle.color,
-            transform: `rotate(${particle.rotation}deg)`,
-          }}
-        />
-      )}
+      <div
+        className="rounded-full"
+        style={{
+          width: particle.size,
+          height: particle.size,
+          backgroundColor: particle.color,
+        }}
+      />
     </motion.div>
   );
 }
