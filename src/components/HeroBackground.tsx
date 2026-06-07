@@ -86,7 +86,7 @@ export default function HeroBackground() {
       {/* SVG Net/Mesh */}
       <svg 
         className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0.4 }}
+        style={{ opacity: 0.7 }}
       >
         <defs>
           <radialGradient id="nodeGradient" cx="50%" cy="50%" r="50%">
@@ -180,9 +180,9 @@ function NetNode({
     <motion.circle
       cx={position.x}
       cy={position.y}
-      r={2}
+      r={2.5}
       fill="#000"
-      opacity={0.2}
+      opacity={0.4}
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: node.id * 0.002, duration: 0.3 }}
@@ -283,8 +283,8 @@ function NetLines({
           x2={line.x2}
           y2={line.y2}
           stroke="#000"
-          strokeWidth={0.5}
-          opacity={0.15}
+          strokeWidth={1}
+          opacity={0.3}
         />
       ))}
     </g>
