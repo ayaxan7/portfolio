@@ -1,9 +1,13 @@
 import Link from 'next/link';
+import HeroBackground from './HeroBackground';
 
 export default function Hero() {
   return (
-    <header className="min-h-screen flex flex-col justify-center items-center text-center px-6 py-24 relative">
-      <div className="max-w-3xl">
+    <header className="min-h-screen flex flex-col justify-center items-center text-center px-6 py-24 relative overflow-hidden">
+      {/* Animated Background */}
+      <HeroBackground />
+      
+      <div className="max-w-3xl relative z-10">
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-gray-500 mb-4">
           Android Developer
         </p>
