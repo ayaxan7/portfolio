@@ -77,11 +77,11 @@ export default function HeroBackground() {
   return (
     <div 
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden pointer-events-none"
+      className="absolute inset-0 overflow-hidden pointer-events-none z-0"
       aria-hidden="true"
     >
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-white/80 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-transparent to-white/80" />
       
       {/* SVG Net/Mesh */}
       <svg 
