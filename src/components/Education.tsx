@@ -27,21 +27,43 @@ export default function Education() {
     <section id="education" className="py-24">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="font-serif text-4xl md:text-5xl text-center mb-4">Education</h2>
-        <div className="w-16 h-px bg-black mx-auto mb-16" />
+        <div 
+          className="w-16 h-px mx-auto mb-16"
+          style={{ backgroundColor: 'var(--divider-accent)' }}
+        />
 
         <div className="grid md:grid-cols-3 gap-6">
           {education.map((edu, index) => (
             <div
               key={index}
-              className="p-6 border border-gray-200 hover:border-black transition-colors duration-300"
+              className="p-6 transition-colors duration-300 theme-card"
+              style={{ 
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: 'var(--border-color)'
+              }}
             >
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
+              <span 
+                className="text-xs font-medium uppercase tracking-wider"
+                style={{ color: 'var(--text-muted)' }}
+              >
                 {edu.year}
               </span>
               <h3 className="font-semibold text-lg mt-2 mb-1">{edu.degree}</h3>
-              {edu.field && <p className="font-medium text-black mb-1">{edu.field}</p>}
-              <p className="text-sm text-gray-600 mb-4">{edu.school}</p>
-              <span className="inline-block text-sm font-semibold px-2 py-1 bg-black text-white">
+              {edu.field && <p className="font-medium mb-1">{edu.field}</p>}
+              <p 
+                className="text-sm mb-4"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {edu.school}
+              </p>
+              <span 
+                className="inline-block text-sm font-semibold px-2 py-1 theme-badge"
+                style={{ 
+                  backgroundColor: 'var(--accent-bg)',
+                  color: 'var(--accent-text)'
+                }}
+              >
                 {edu.score}
               </span>
             </div>

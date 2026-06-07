@@ -105,9 +105,15 @@ export default function Contact() {
     <section id="contact" className="py-24">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="font-serif text-4xl md:text-5xl text-center mb-4">Get in Touch</h2>
-        <div className="w-16 h-px bg-black mx-auto mb-8" />
+        <div 
+          className="w-16 h-px mx-auto mb-8"
+          style={{ backgroundColor: 'var(--divider-accent)' }}
+        />
 
-        <p className="text-lg text-gray-600 text-center max-w-xl mx-auto mb-12">
+        <p 
+          className="text-lg text-center max-w-xl mx-auto mb-12"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           I&apos;m always open to discussing new projects, creative ideas, or opportunities to be part of
           your vision.
         </p>
@@ -119,7 +125,11 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label 
+                    htmlFor="name" 
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     Name
                   </label>
                   <input
@@ -129,12 +139,23 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 transition-colors focus:outline-none"
+                    style={{ 
+                      backgroundColor: 'var(--bg-primary)',
+                      color: 'var(--text-primary)',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: 'var(--border-color)'
+                    }}
                     placeholder="Your name"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label 
+                    htmlFor="email" 
+                    className="block text-sm font-medium mb-1"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     Email
                   </label>
                   <input
@@ -144,14 +165,25 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 transition-colors focus:outline-none"
+                    style={{ 
+                      backgroundColor: 'var(--bg-primary)',
+                      color: 'var(--text-primary)',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: 'var(--border-color)'
+                    }}
                     placeholder="your@email.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                <label 
+                  htmlFor="subject" 
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   Subject
                 </label>
                 <input
@@ -161,13 +193,24 @@ export default function Contact() {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 transition-colors focus:outline-none"
+                  style={{ 
+                    backgroundColor: 'var(--bg-primary)',
+                    color: 'var(--text-primary)',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'var(--border-color)'
+                  }}
                   placeholder="What's this about?"
                 />
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                <label 
+                  htmlFor="message" 
+                  className="block text-sm font-medium mb-1"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   Message
                 </label>
                 <textarea
@@ -177,7 +220,14 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   rows={5}
-                  className="w-full px-4 py-3 border border-gray-200 focus:border-black focus:outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 transition-colors resize-none focus:outline-none"
+                  style={{ 
+                    backgroundColor: 'var(--bg-primary)',
+                    color: 'var(--text-primary)',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'var(--border-color)'
+                  }}
                   placeholder="Your message..."
                 />
               </div>
@@ -185,7 +235,14 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="w-full px-8 py-4 text-sm font-medium uppercase tracking-wider bg-black text-white border border-black hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-8 py-4 text-sm font-medium uppercase tracking-wider transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hero-btn-primary"
+                style={{ 
+                  backgroundColor: 'var(--accent-bg)',
+                  color: 'var(--accent-text)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--accent-bg)'
+                }}
               >
                 {status === 'loading' ? 'Sending...' : 'Send Message'}
               </button>
@@ -209,7 +266,13 @@ export default function Contact() {
                   href={link.href}
                   target={link.external ? '_blank' : undefined}
                   rel={link.external ? 'noopener noreferrer' : undefined}
-                  className="flex items-center gap-4 p-4 border border-gray-200 text-gray-700 hover:bg-black hover:text-white hover:border-black transition-all duration-300 group"
+                  className="flex items-center gap-4 p-4 transition-all duration-300 group theme-link"
+                  style={{ 
+                    color: 'var(--text-secondary)',
+                    borderWidth: '1px',
+                    borderStyle: 'solid',
+                    borderColor: 'var(--border-color)'
+                  }}
                 >
                   <span className="group-hover:scale-110 transition-transform">{link.icon}</span>
                   <span className="text-sm">{link.label}</span>

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useMotionValue, useSpring } from 'framer-motion';
+import { useTheme } from './ThemeProvider';
 
 interface Particle {
   id: number;
@@ -10,29 +11,32 @@ interface Particle {
   size: number;
   opacity: number;
   speed: number;
-  color: string;
+  colorIndex: number; // Store index instead of color string
+  region: 'top' | 'middle' | 'bottom';
 }
 
 const PARTICLE_COUNT = 200;
 const GLOBE_RADIUS = 300;
 
-// Color based on position on sphere (top = blue, bottom = warm)
-const getColorForPhi = (phi: number): string => {
-  const colors = {
-    top: ['#3B82F6', '#6366F1', '#8B5CF6', '#2563EB'], // Blues/purples
-    middle: ['#6B7280', '#9CA3AF', '#71717A', '#A1A1AA'], // Grays
-    bottom: ['#EF4444', '#F97316', '#F59E0B', '#EC4899', '#FB923C'], // Warm colors
-  };
-  
-  const normalizedPhi = phi / Math.PI; // 0 to 1
-  
-  if (normalizedPhi < 0.35) {
-    return colors.top[Math.floor(Math.random() * colors.top.length)];
-  } else if (normalizedPhi < 0.65) {
-    return colors.middle[Math.floor(Math.random() * colors.middle.length)];
-  } else {
-    return colors.bottom[Math.floor(Math.random() * colors.bottom.length)];
-  }
+// Theme-aware color palettes
+const lightColors = {
+  top: ['#3B82F6', '#6366F1', '#8B5CF6', '#2563EB'], // Blues/purples
+  middle: ['#6B7280', '#9CA3AF', '#71717A', '#A1A1AA'], // Grays
+  bottom: ['#EF4444', '#F97316', '#F59E0B', '#EC4899', '#FB923C'], // Warm colors
+};
+
+const darkColors = {
+  top: ['#60A5FA', '#818CF8', '#A78BFA', '#3B82F6'], // Lighter blues/purples
+  middle: ['#9CA3AF', '#D1D5DB', '#A1A1AA', '#E5E7EB'], // Lighter grays
+  bottom: ['#F87171', '#FB923C', '#FBBF24', '#F472B6', '#FDBA74'], // Lighter warm colors
+};
+
+// Get region based on phi angle
+const getRegionForPhi = (phi: number): 'top' | 'middle' | 'bottom' => {
+  const normalizedPhi = phi / Math.PI;
+  if (normalizedPhi < 0.35) return 'top';
+  if (normalizedPhi < 0.65) return 'middle';
+  return 'bottom';
 };
 
 export default function HeroBackground() {
@@ -40,6 +44,7 @@ export default function HeroBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>(0);
+  const { theme } = useTheme();
   
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -48,13 +53,15 @@ export default function HeroBackground() {
   const smoothMouseX = useSpring(mouseX, { damping: 50, stiffness: 100, mass: 1 });
   const smoothMouseY = useSpring(mouseY, { damping: 50, stiffness: 100, mass: 1 });
 
-  // Generate particles
+  // Generate particles (only once, theme-independent structure)
   useEffect(() => {
     const particles: Particle[] = [];
     
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const phi = Math.acos(1 - 2 * (i + 0.5) / PARTICLE_COUNT);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      const region = getRegionForPhi(phi);
+      const colorPalette = lightColors[region];
       
       particles.push({
         id: i,
@@ -63,7 +70,8 @@ export default function HeroBackground() {
         size: 1.5 + Math.random() * 2,
         opacity: 0.5 + Math.random() * 0.4,
         speed: 0.15 + Math.random() * 0.1,
-        color: getColorForPhi(phi),
+        colorIndex: Math.floor(Math.random() * colorPalette.length),
+        region,
       });
     }
     
@@ -115,6 +123,7 @@ export default function HeroBackground() {
     if (!ctx) return;
 
     let startTime = Date.now();
+    const colors = theme === 'dark' ? darkColors : lightColors;
 
     const animate = () => {
       const time = (Date.now() - startTime) * 0.0003;
@@ -156,11 +165,15 @@ export default function HeroBackground() {
         // Size also affected by depth
         const size = particle.size * scale * window.devicePixelRatio;
 
+        // Get theme-aware color
+        const colorPalette = colors[particle.region];
+        const color = colorPalette[particle.colorIndex % colorPalette.length];
+
         // Draw dot with color
         ctx.beginPath();
         ctx.arc(x2d, y2d, size, 0, Math.PI * 2);
         ctx.globalAlpha = opacity;
-        ctx.fillStyle = particle.color;
+        ctx.fillStyle = color;
         ctx.fill();
         ctx.globalAlpha = 1;
       });
@@ -171,7 +184,7 @@ export default function HeroBackground() {
     animate();
 
     return () => cancelAnimationFrame(animationRef.current);
-  }, [smoothMouseX, smoothMouseY]);
+  }, [smoothMouseX, smoothMouseY, theme]);
 
   return (
     <div 

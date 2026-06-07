@@ -56,32 +56,53 @@ function MedalIcon() {
 
 export default function Achievements() {
   return (
-    <section id="achievements" className="py-24 bg-gray-100">
+    <section 
+      id="achievements" 
+      className="py-24"
+      style={{ backgroundColor: 'var(--bg-secondary)' }}
+    >
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="font-serif text-4xl md:text-5xl text-center mb-4">Achievements</h2>
-        <div className="w-16 h-px bg-black mx-auto mb-16" />
+        <div 
+          className="w-16 h-px mx-auto mb-16"
+          style={{ backgroundColor: 'var(--divider-accent)' }}
+        />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {achievements.map((achievement, index) => (
             <div
               key={index}
               className={`p-6 text-center transition-all duration-300 ${
-                achievement.featured
-                  ? 'bg-black text-white'
-                  : 'bg-white border border-gray-200 hover:border-black'
+                achievement.featured ? '' : 'theme-card'
               }`}
+              style={
+                achievement.featured
+                  ? { backgroundColor: 'var(--featured-bg)', color: 'var(--featured-text)' }
+                  : { 
+                      backgroundColor: 'var(--bg-card)',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderColor: 'var(--border-color)'
+                    }
+              }
             >
               <div className="mb-4 flex justify-center">
                 {achievement.featured ? <StarIcon /> : <MedalIcon />}
               </div>
               <h3 className="font-semibold text-base mb-1">{achievement.title}</h3>
-              <p className={`text-sm mb-2 ${achievement.featured ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p 
+                className="text-sm mb-2"
+                style={{ color: achievement.featured ? 'var(--featured-muted)' : 'var(--text-secondary)' }}
+              >
                 {achievement.description}
               </p>
               <span
-                className={`inline-block text-xs px-2 py-1 ${
-                  achievement.featured ? 'bg-gray-900 text-gray-500' : 'bg-gray-100 text-gray-600'
-                }`}
+                className="inline-block text-xs px-2 py-1"
+                style={
+                  achievement.featured
+                    ? { backgroundColor: 'var(--featured-badge-bg)', color: 'var(--featured-badge-text)' }
+                    : { backgroundColor: 'var(--bg-elevated)', color: 'var(--text-secondary)' }
+                }
               >
                 {achievement.detail}
               </span>

@@ -60,27 +60,72 @@ export default function Experience() {
     <section id="experience" className="py-24">
       <div className="max-w-6xl mx-auto px-6">
         <h2 className="font-serif text-4xl md:text-5xl text-center mb-4">Experience</h2>
-        <div className="w-16 h-px bg-black mx-auto mb-16" />
+        <div 
+          className="w-16 h-px mx-auto mb-16"
+          style={{ backgroundColor: 'var(--divider-accent)' }}
+        />
 
-        <div className="relative pl-8 border-l border-gray-300">
+        <div 
+          className="relative pl-8 border-l"
+          style={{ borderColor: 'var(--border-color)' }}
+        >
           {experiences.map((exp, index) => (
             <div key={index} className="relative pb-12 last:pb-0">
               {/* Timeline marker */}
-              <div className="absolute -left-[calc(2rem+4px)] top-1.5 w-2 h-2 bg-white border border-black rounded-full" />
+              <div 
+                className="absolute -left-[calc(2rem+4px)] top-1.5 w-2 h-2 rounded-full"
+                style={{ 
+                  backgroundColor: 'var(--bg-primary)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--text-primary)'
+                }}
+              />
 
-              <div className="bg-white border border-gray-200 p-6 hover:border-black transition-colors duration-300">
+              <div 
+                className="p-6 transition-colors duration-300 theme-card"
+                style={{ 
+                  backgroundColor: 'var(--bg-card)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderColor: 'var(--border-color)'
+                }}
+              >
                 <div className="mb-4">
                   <h3 className="font-semibold text-lg">{exp.title}</h3>
-                  <span className="block font-medium text-black">{exp.company}</span>
+                  <span className="block font-medium">{exp.company}</span>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    <span className="text-sm text-gray-500">{exp.date}</span>
-                    <span className="text-sm text-gray-500 px-2 py-0.5 bg-gray-100">{exp.type}</span>
+                    <span 
+                      className="text-sm"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      {exp.date}
+                    </span>
+                    <span 
+                      className="text-sm px-2 py-0.5"
+                      style={{ 
+                        color: 'var(--text-muted)',
+                        backgroundColor: 'var(--bg-elevated)'
+                      }}
+                    >
+                      {exp.type}
+                    </span>
                   </div>
                 </div>
 
                 <ul className="space-y-2 pl-4">
                   {exp.details.map((detail, idx) => (
-                    <li key={idx} className="relative text-gray-600 text-sm leading-relaxed before:content-[''] before:absolute before:-left-4 before:top-2.5 before:w-1 before:h-px before:bg-gray-400">
+                    <li 
+                      key={idx} 
+                      className="relative text-sm leading-relaxed before:content-[''] before:absolute before:-left-4 before:top-2.5 before:w-1 before:h-px"
+                      style={{ 
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      <span 
+                        className="absolute -left-4 top-2.5 w-1 h-px"
+                        style={{ backgroundColor: 'var(--text-muted)' }}
+                      />
                       {detail}
                     </li>
                   ))}
