@@ -86,15 +86,8 @@ export default function HeroBackground() {
       {/* SVG Net/Mesh */}
       <svg 
         className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0.7 }}
+        style={{ opacity: 0.5 }}
       >
-        <defs>
-          <radialGradient id="nodeGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#000" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#000" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        
         {/* Grid lines */}
         <NetLines 
           nodes={nodes} 
@@ -102,16 +95,6 @@ export default function HeroBackground() {
           smoothMouseY={smoothMouseY}
           dimensions={dimensions}
         />
-        
-        {/* Grid nodes */}
-        {nodes.map((node) => (
-          <NetNode
-            key={node.id}
-            node={node}
-            smoothMouseX={smoothMouseX}
-            smoothMouseY={smoothMouseY}
-          />
-        ))}
       </svg>
 
       {/* Cursor glow effect */}
@@ -126,67 +109,6 @@ export default function HeroBackground() {
         }}
       />
     </div>
-  );
-}
-
-// Individual node that responds to cursor
-function NetNode({ 
-  node, 
-  smoothMouseX, 
-  smoothMouseY 
-}: { 
-  node: Node;
-  smoothMouseX: ReturnType<typeof useSpring>;
-  smoothMouseY: ReturnType<typeof useSpring>;
-}) {
-  const [position, setPosition] = useState({ x: node.originalX, y: node.originalY });
-  
-  useEffect(() => {
-    const unsubX = smoothMouseX.on('change', (latestX) => {
-      const latestY = smoothMouseY.get();
-      updatePosition(latestX, latestY);
-    });
-    
-    const unsubY = smoothMouseY.on('change', (latestY) => {
-      const latestX = smoothMouseX.get();
-      updatePosition(latestX, latestY);
-    });
-    
-    function updatePosition(cursorX: number, cursorY: number) {
-      const dx = node.originalX - cursorX;
-      const dy = node.originalY - cursorY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      if (distance < INFLUENCE_RADIUS) {
-        const force = (1 - distance / INFLUENCE_RADIUS) * MAX_DISPLACEMENT;
-        const angle = Math.atan2(dy, dx);
-        
-        setPosition({
-          x: node.originalX + Math.cos(angle) * force,
-          y: node.originalY + Math.sin(angle) * force,
-        });
-      } else {
-        setPosition({ x: node.originalX, y: node.originalY });
-      }
-    }
-    
-    return () => {
-      unsubX();
-      unsubY();
-    };
-  }, [node.originalX, node.originalY, smoothMouseX, smoothMouseY]);
-
-  return (
-    <motion.circle
-      cx={position.x}
-      cy={position.y}
-      r={2.5}
-      fill="#000"
-      opacity={0.4}
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ delay: node.id * 0.002, duration: 0.3 }}
-    />
   );
 }
 
@@ -283,8 +205,8 @@ function NetLines({
           x2={line.x2}
           y2={line.y2}
           stroke="#000"
-          strokeWidth={1}
-          opacity={0.3}
+          strokeWidth={0.8}
+          opacity={0.25}
         />
       ))}
     </g>
