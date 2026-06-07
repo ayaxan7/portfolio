@@ -1,93 +1,75 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { useMotionValue, useSpring } from 'framer-motion';
 
 interface Particle {
   id: number;
-  // Spherical coordinates
-  theta: number; // horizontal angle (0 to 2π)
-  phi: number; // vertical angle (0 to π)
+  theta: number;
+  phi: number;
   size: number;
-  color: string;
-  speed: number; // rotation speed multiplier
+  opacity: number;
+  speed: number;
 }
 
-// Color based on position on sphere (top = blue, bottom = warm)
-const getColorForPhi = (phi: number): string => {
-  const colors = {
-    top: ['#3B82F6', '#6366F1', '#8B5CF6', '#2563EB'], // Blues/purples
-    middle: ['#6B7280', '#9CA3AF', '#71717A', '#A1A1AA'], // Grays
-    bottom: ['#EF4444', '#F97316', '#F59E0B', '#EC4899', '#FB923C'], // Warm colors
-  };
-  
-  const normalizedPhi = phi / Math.PI; // 0 to 1
-  
-  if (normalizedPhi < 0.35) {
-    return colors.top[Math.floor(Math.random() * colors.top.length)];
-  } else if (normalizedPhi < 0.65) {
-    return colors.middle[Math.floor(Math.random() * colors.middle.length)];
-  } else {
-    return colors.bottom[Math.floor(Math.random() * colors.bottom.length)];
-  }
-};
-
-const PARTICLE_COUNT = 150;
-const GLOBE_RADIUS = 280; // pixels - radius of the particle globe
-const GAP_RADIUS = 40; // pixels - empty space around cursor (about 1cm)
+const PARTICLE_COUNT = 200;
+const GLOBE_RADIUS = 300;
 
 export default function HeroBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>(0);
-  const timeRef = useRef<number>(0);
   
-  // Cursor position
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   
-  // Smooth cursor following
-  const smoothMouseX = useSpring(mouseX, { damping: 25, stiffness: 150 });
-  const smoothMouseY = useSpring(mouseY, { damping: 25, stiffness: 150 });
+  // Very smooth spring for cursor following
+  const smoothMouseX = useSpring(mouseX, { damping: 50, stiffness: 100, mass: 1 });
+  const smoothMouseY = useSpring(mouseY, { damping: 50, stiffness: 100, mass: 1 });
 
-  // Generate particles on sphere
+  // Generate particles
   useEffect(() => {
-    const generated: Particle[] = [];
+    const particles: Particle[] = [];
     
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Distribute points on sphere using fibonacci spiral
       const phi = Math.acos(1 - 2 * (i + 0.5) / PARTICLE_COUNT);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
       
-      generated.push({
+      particles.push({
         id: i,
         theta,
         phi,
-        size: Math.random() * 4 + 2,
-        color: getColorForPhi(phi),
-        speed: 0.3 + Math.random() * 0.4,
+        size: 1.5 + Math.random() * 2,
+        opacity: 0.3 + Math.random() * 0.4,
+        speed: 0.15 + Math.random() * 0.1,
       });
     }
     
-    setParticles(generated);
+    particlesRef.current = particles;
   }, []);
 
-  // Track dimensions
+  // Initialize canvas and cursor
   useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
-        // Initialize cursor to center
-        mouseX.set(width / 2);
-        mouseY.set(height / 2);
-      }
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const updateSize = () => {
+      const { width, height } = container.getBoundingClientRect();
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      
+      // Initialize cursor to center
+      mouseX.set(width / 2);
+      mouseY.set(height / 2);
     };
-    
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
   }, [mouseX, mouseY]);
 
   // Track mouse
@@ -103,97 +85,81 @@ export default function HeroBackground() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
+  // Animation loop using Canvas for smoothness
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let startTime = Date.now();
+
+    const animate = () => {
+      const time = (Date.now() - startTime) * 0.0003;
+      const cursorX = smoothMouseX.get() * window.devicePixelRatio;
+      const cursorY = smoothMouseY.get() * window.devicePixelRatio;
+      const radius = GLOBE_RADIUS * window.devicePixelRatio;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Sort particles by z-depth for proper layering
+      const sortedParticles = [...particlesRef.current].map(particle => {
+        const theta = particle.theta + time * particle.speed;
+        const z3d = radius * Math.sin(particle.phi) * Math.sin(theta);
+        return { ...particle, currentTheta: theta, z3d };
+      }).sort((a, b) => a.z3d - b.z3d);
+
+      // Draw particles
+      sortedParticles.forEach(particle => {
+        const theta = particle.currentTheta;
+        const phi = particle.phi;
+
+        // Spherical to cartesian
+        const x3d = radius * Math.sin(phi) * Math.cos(theta);
+        const y3d = radius * Math.cos(phi);
+        const z3d = particle.z3d;
+
+        // Perspective projection
+        const perspective = 800 * window.devicePixelRatio;
+        const scale = perspective / (perspective + z3d);
+
+        const x2d = cursorX + x3d * scale;
+        const y2d = cursorY + y3d * scale;
+
+        // Depth-based opacity (particles in back are dimmer)
+        const depthFactor = (z3d + radius) / (2 * radius);
+        const opacity = particle.opacity * (0.2 + depthFactor * 0.8);
+
+        // Size also affected by depth
+        const size = particle.size * scale * window.devicePixelRatio;
+
+        // Draw dot
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        ctx.fill();
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => cancelAnimationFrame(animationRef.current);
+  }, [smoothMouseX, smoothMouseY]);
+
   return (
     <div 
       ref={containerRef}
       className="absolute inset-0 overflow-hidden pointer-events-none z-0"
       aria-hidden="true"
     >
-      {particles.map((particle) => (
-        <GlobeParticle
-          key={particle.id}
-          particle={particle}
-          smoothMouseX={smoothMouseX}
-          smoothMouseY={smoothMouseY}
-        />
-      ))}
-    </div>
-  );
-}
-
-function GlobeParticle({
-  particle,
-  smoothMouseX,
-  smoothMouseY,
-}: {
-  particle: Particle;
-  smoothMouseX: ReturnType<typeof useSpring>;
-  smoothMouseY: ReturnType<typeof useSpring>;
-}) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const timeOffset = useRef(Math.random() * Math.PI * 2);
-
-  useEffect(() => {
-    let animationId: number;
-    
-    const animate = () => {
-      const time = Date.now() * 0.0005;
-      const cursorX = smoothMouseX.get();
-      const cursorY = smoothMouseY.get();
-      
-      // Slowly rotate the sphere
-      const theta = particle.theta + time * particle.speed;
-      const phi = particle.phi;
-      
-      // Convert spherical to cartesian (3D)
-      const x3d = GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta);
-      const y3d = GLOBE_RADIUS * Math.cos(phi);
-      const z3d = GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta);
-      
-      // Simple perspective projection
-      const perspective = 600;
-      const scale = perspective / (perspective + z3d);
-      
-      // Project to 2D and offset by cursor position
-      const x2d = cursorX + x3d * scale;
-      const y2d = cursorY + y3d * scale;
-      
-      setPosition({ x: x2d, y: y2d });
-      
-      animationId = requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-    return () => cancelAnimationFrame(animationId);
-  }, [particle, smoothMouseX, smoothMouseY]);
-
-  // Calculate opacity based on z-depth (particles behind are dimmer)
-  const time = Date.now() * 0.0005;
-  const theta = particle.theta + time * particle.speed;
-  const z3d = GLOBE_RADIUS * Math.sin(particle.phi) * Math.sin(theta);
-  const depthOpacity = 0.3 + ((z3d + GLOBE_RADIUS) / (2 * GLOBE_RADIUS)) * 0.5;
-
-  return (
-    <motion.div
-      className="absolute"
-      style={{
-        left: position.x,
-        top: position.y,
-        transform: 'translate(-50%, -50%)',
-      }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: depthOpacity }}
-      transition={{ duration: 0.3 }}
-    >
-      <div
-        className="rounded-full"
-        style={{
-          width: particle.size,
-          height: particle.size,
-          backgroundColor: particle.color,
-        }}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
       />
-    </motion.div>
+    </div>
   );
 }
