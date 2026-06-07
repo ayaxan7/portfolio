@@ -10,10 +10,30 @@ interface Particle {
   size: number;
   opacity: number;
   speed: number;
+  color: string;
 }
 
 const PARTICLE_COUNT = 200;
 const GLOBE_RADIUS = 300;
+
+// Color based on position on sphere (top = blue, bottom = warm)
+const getColorForPhi = (phi: number): string => {
+  const colors = {
+    top: ['#3B82F6', '#6366F1', '#8B5CF6', '#2563EB'], // Blues/purples
+    middle: ['#6B7280', '#9CA3AF', '#71717A', '#A1A1AA'], // Grays
+    bottom: ['#EF4444', '#F97316', '#F59E0B', '#EC4899', '#FB923C'], // Warm colors
+  };
+  
+  const normalizedPhi = phi / Math.PI; // 0 to 1
+  
+  if (normalizedPhi < 0.35) {
+    return colors.top[Math.floor(Math.random() * colors.top.length)];
+  } else if (normalizedPhi < 0.65) {
+    return colors.middle[Math.floor(Math.random() * colors.middle.length)];
+  } else {
+    return colors.bottom[Math.floor(Math.random() * colors.bottom.length)];
+  }
+};
 
 export default function HeroBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,8 +61,9 @@ export default function HeroBackground() {
         theta,
         phi,
         size: 1.5 + Math.random() * 2,
-        opacity: 0.3 + Math.random() * 0.4,
+        opacity: 0.5 + Math.random() * 0.4,
         speed: 0.15 + Math.random() * 0.1,
+        color: getColorForPhi(phi),
       });
     }
     
@@ -135,11 +156,13 @@ export default function HeroBackground() {
         // Size also affected by depth
         const size = particle.size * scale * window.devicePixelRatio;
 
-        // Draw dot
+        // Draw dot with color
         ctx.beginPath();
         ctx.arc(x2d, y2d, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        ctx.globalAlpha = opacity;
+        ctx.fillStyle = particle.color;
         ctx.fill();
+        ctx.globalAlpha = 1;
       });
 
       animationRef.current = requestAnimationFrame(animate);
