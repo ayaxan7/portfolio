@@ -25,27 +25,13 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     setMounted(true);
-    // Check system preference
-    const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    // Check localStorage for saved preference, otherwise use system
+    // Check localStorage for saved preference, otherwise default to light
     const savedTheme = localStorage.getItem('theme') as Theme | null;
-    const initialTheme = savedTheme || systemPreference;
+    const initialTheme = savedTheme || 'light';
     
     setTheme(initialTheme);
     document.documentElement.classList.toggle('dark', initialTheme === 'dark');
 
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (!localStorage.getItem('theme')) {
-        const newTheme = e.matches ? 'dark' : 'light';
-        setTheme(newTheme);
-        document.documentElement.classList.toggle('dark', newTheme === 'dark');
-      }
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   const toggleTheme = () => {

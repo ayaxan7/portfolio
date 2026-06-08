@@ -42,7 +42,7 @@ export default function RootLayout({
                 try {
                   var theme = localStorage.getItem('theme');
                   if (!theme) {
-                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    theme = 'light';
                   }
                   if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
