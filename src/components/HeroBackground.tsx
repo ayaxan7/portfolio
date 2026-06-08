@@ -16,8 +16,6 @@ interface Shape {
   opacity: number;
 }
 
-const SHAPE_COUNT = 30;
-
 function randomInRange(min: number, max: number) {
   return min + Math.random() * (max - min);
 }
@@ -38,7 +36,8 @@ export default function HeroBackground() {
   useEffect(() => {
     const types: Shape['type'][] = ['circle', 'square', 'triangle'];
     const shapes: Shape[] = [];
-    for (let i = 0; i < SHAPE_COUNT; i++) {
+    const count = window.innerWidth < 768 ? 10 : 30;
+    for (let i = 0; i < count; i++) {
       shapes.push({
         x: Math.random() * 100,
         y: Math.random() * 100,
