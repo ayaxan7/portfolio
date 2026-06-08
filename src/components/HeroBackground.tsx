@@ -100,9 +100,9 @@ export default function HeroBackground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const REPULSION_RADIUS = 120;
-    const REPULSION_FORCE = 0.6;
-    const DAMPING = 0.98;
+    const REPULSION_RADIUS = 140;
+    const REPULSION_FORCE = 0.9;
+    const DAMPING = 0.997;
 
     const animate = () => {
       const w = canvas.width;
