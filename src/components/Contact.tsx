@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import NeuralNetworkBackground from './NeuralNetworkBackground';
 
 const socialLinks = [
   {
@@ -102,8 +103,9 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24">
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="contact" className="relative py-24">
+      <NeuralNetworkBackground />
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
         <h2 className="font-serif text-4xl md:text-5xl text-center mb-4">Get in Touch</h2>
         <div 
           className="w-16 h-px mx-auto mb-8"
@@ -268,7 +270,6 @@ export default function Contact() {
                   rel={link.external ? 'noopener noreferrer' : undefined}
                   className="flex items-center gap-4 p-4 transition-all duration-300 group theme-link"
                   style={{ 
-                    color: 'var(--text-secondary)',
                     borderWidth: '1px',
                     borderStyle: 'solid',
                     borderColor: 'var(--border-color)'
