@@ -13,18 +13,12 @@ interface Node {
 }
 
 function getNodeCount(): number {
-  if (typeof window === 'undefined') return 100;
+  if (typeof window === 'undefined') return 60;
   const w = window.innerWidth;
-  if (w < 640) return 60;
-  if (w < 1024) return 100;
-  if (w < 1440) return 150;
-  return 200;
-}
-
-function hexToRgb(hex: string): string {
-  const clean = hex.replace('#', '');
-  const num = parseInt(clean, 16);
-  return `${(num >> 16) & 255},${(num >> 8) & 255},${num & 255}`;
+  if (w < 640) return 30;
+  if (w < 1024) return 50;
+  if (w < 1440) return 80;
+  return 100;
 }
 
 export default function NeuralNetworkBackground() {
@@ -45,7 +39,7 @@ export default function NeuralNetworkBackground() {
         vx: (Math.random() - 0.5) * 0.03,
         vy: (Math.random() - 0.5) * 0.03,
         radius: 1.2 + Math.random() * 2,
-        baseOpacity: 0.1 + Math.random() * 0.18,
+        baseOpacity: 0.2 + Math.random() * 0.25,
       });
     }
     nodesRef.current = nodes;
@@ -97,14 +91,10 @@ export default function NeuralNetworkBackground() {
     if (!ctx) return;
 
     const isDark = theme === 'dark';
+    const colorBase = isDark ? '255,255,255' : '10,10,10';
+    const connBase = isDark ? '163,163,163' : '82,82,82';
 
-    const styles = getComputedStyle(document.documentElement);
-    const nodeHex = styles.getPropertyValue('--text-primary').trim();
-    const connHex = styles.getPropertyValue('--text-secondary').trim();
-    const colorBase = hexToRgb(nodeHex);
-    const connBase = hexToRgb(connHex);
-
-    const CONNECTION_DIST = 14;
+    const CONNECTION_DIST = 16;
     const MOUSE_RADIUS = 18;
     const MOUSE_FORCE = 0.015;
     const DAMPING = 0.997;
@@ -133,8 +123,8 @@ export default function NeuralNetworkBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MOUSE_RADIUS && dist > 0.1) {
             const force = (1 - dist / MOUSE_RADIUS) * MOUSE_FORCE;
-            node.vx += (dx / dist) * force;
-            node.vy += (dy / dist) * force;
+            node.vx -= (dx / dist) * force;
+            node.vy -= (dy / dist) * force;
           }
         }
 
@@ -151,7 +141,7 @@ export default function NeuralNetworkBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < CONNECTION_DIST) {
-            let opacity = (1 - dist / CONNECTION_DIST) * 0.08;
+            let opacity = (1 - dist / CONNECTION_DIST) * 0.2;
 
             if (mouse.x >= 0 && mouse.y >= 0) {
               const mx = (a.x + b.x) / 2;
@@ -162,12 +152,12 @@ export default function NeuralNetworkBackground() {
               }
             }
 
-            if (opacity > 0.005) {
+            if (opacity > 0.01) {
               ctx.beginPath();
               ctx.moveTo((a.x / 100) * w, (a.y / 100) * h);
               ctx.lineTo((b.x / 100) * w, (b.y / 100) * h);
-              ctx.strokeStyle = `rgba(${connBase},${Math.min(opacity, 0.4)})`;
-              ctx.lineWidth = 1 * dpr;
+              ctx.strokeStyle = `rgba(${connBase},${Math.min(opacity, 0.5)})`;
+              ctx.lineWidth = 1.5 * dpr;
               ctx.stroke();
             }
           }

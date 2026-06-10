@@ -7,6 +7,7 @@ import Skills from "@/components/Skills";
 import Achievements from "@/components/Achievements";
 import Education from "@/components/Education";
 import Contact from "@/components/Contact";
+import NeuralNetworkBackground from "@/components/NeuralNetworkBackground";
 
 export default function Home() {
   return (
@@ -19,8 +20,11 @@ export default function Home() {
         <Projects />
         <Skills />
         <Achievements />
-        <Education />
-        <Contact />
+        <div className="relative">
+          <NeuralNetworkBackground />
+          <Education />
+          <Contact />
+        </div>
       </main>
     </>
   );
